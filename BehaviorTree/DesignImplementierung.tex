@@ -1,0 +1,213 @@
+\section{Design und Implementierung}
+\autor{Gamze Isik}
+
+
+\subsection{Werkzeuge}
+
+Die Entscheidung für Groot2 als Tool für die Behavior-Tree-Implementierung in unserem autonomen Fahrsystem wurde durch seine benutzerfreundliche Oberfläche, die Flexibilität bei der Modellierung komplexer Verhaltensmuster und die nahtlose Integration in C++-Projekte getroffen. Die Integration erfolgt über .xml Dateien, die in C++ eingebunden werden. Diese .xml Dateien werden automatisch von Groot2 generiert.\\
+
+Die Hauptmethode zur Überprüfung des Verhaltensbaums ist die Simulation innerhalb der Groot2-Benutzeroberfläche. Durch die Initiierung der Simulation kann der Verhaltensbaum in Echtzeit ausgeführt und visuell überwacht werden. Diese Methode ermöglicht eine detaillierte Analyse des Ablaufs des Verhaltensbaums, einschließlich der Aktivierung einzelner Knoten und der Reaktion des Fahrzeugs auf verschiedene Szenarien.\\
+
+Als Bibliothek wird die Open-Source Library "BehaviorTree.CPP" verwendet. Diese C++-Bibliothek bietet ein Framework zur Erstellung von Verhaltensbäumen. Sie wurde entwickelt, um flexibel, benutzerfreundlich und schnell zu sein.\cite{bt-cpp}
+
+\newpage
+\subsection{Anforderungen und Szenarien}
+
+Für die Konzeption des Verhaltensbaums werden die Anforderungen durch das BFMC definiert. Diese Anforderungen beziehen sich auf den Straßenverkehr und umfassen Szenarien, die das Fahrzeug beherrschen sollte, um die maximale Punktzahl zu erzielen. Dabei unterliegt das Fahrzeug einer Reihe von allgemeinen Verkehrsregeln:
+
+\begin{itemize}
+    \item Rechtsfahrgebot: Das Fahrzeug ist verpflichtet, auf der rechten Seite der Straße zu fahren, um den Verkehrsfluss und die Sicherheit zu gewährleisten.
+    \item Überquerung von Linien: Gestrichelte Linien dürfen überquert werden, während durchgezogene Linien nicht überquert werden dürfen. Diese Regelung ist entscheidend für das korrekte Verhalten des Fahrzeugs im Straßenverkehr.
+\end{itemize}
+
+Darüber hinaus müssen spezifische Aktionen ausgeführt werden, sobald bestimmte Hindernisse auftreten:
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{ |p{4cm}|p{11cm}| }
+\hline
+\rowcolor{pink!35}
+\textbf{Name} & \textbf{Beschreibung} \\
+\hline
+\cline{1-2}
+Ampel & Begegnet vor der Kreuzung. Farbe ROT, das Fahrzeug muss halten. Grün, das Fahrzeug muss gehen, gelbe Farbe, bis zu Ihnen.\\
+\cline{1-2}
+Stopschild & Das Fahrzeug muss 3 Sekunden vor der Kreuzung anhalten.\\
+\cline{1-2}
+Zebrastreifen & Das Fahrzeug muss auf dem Fußgängerüberweg sichtbar abbremsen. \\
+\cline{1-2}
+Vorfahrt &  Das Fahrzeug muss ohne anzuhalten in die Kreuzung einfahren. \\
+\cline{1-2}
+Autobahneinfahrt & Das Fahrzeug muss seine Geschwindigkeit sichtbar erhöhen. \\
+\cline{1-2}
+Autobahnende & Das Fahrzeug muss wieder die normale Geschwindigkeit erreichen. \\
+\cline{1-2}
+Fußgänger auf dem Zebrastreifen & Der Fußgänger signalisiert die Absicht, die Straße am Zebrastreifen zu überqueren. Das Fahrzeug muss anhalten, bis die Aktion ausgeführt wird. \\
+\cline{1-2}
+Fußgänger auf nicht signalisierter Straße & Fußgänger, der sich in der Mitte der Fahrbahn befindet. Das Fahrzeug muss anhalten, bis die Straße frei ist.\\
+\cline{1-2}
+Feststehendes Fahrzeug & Feststehendes Fahrzeug simuliert falsches Parken oder eine Panne. Das Fahrzeug muss nach Möglichkeit überholen. \\
+\cline{1-2}
+Fahrendes Fahrzeug & Fahrendes Auto auf der Straße. Das Fahrzeug muss überholen, wenn es möglich ist, oder andernfalls hinterherfahren. \\
+\cline{1-2}
+Einbahnstraße & Signalisiert eine Einbahnstraße.\\
+\cline{1-2}
+Kreisverkehr & Signalisiert einen Kreisverkehr.\\
+\cline{1-2}
+Betreten verboten & Signalisiert eine nicht befahrbare Straße.\\
+\cline{1-2}
+\end{tabular}
+\caption{Verkehrsregeln}
+\cite{bfmc-traficRule}
+\label{traficRules}
+\end{table}
+
+Beim Design des Behavior Trees fließen diese Anforderungen in die Konzeption mit ein.
+
+\newpage
+\subsection{Entwurf des Verhaltensbaums}
+
+Bei der Gestaltung des Verhaltensbaums für das Fahrzeug werden die Anforderungen an die Echtzeit-Entscheidungsfindung sorgfältig berücksichtigt. Der hierarchisch strukturierte Behavior Tree beinhaltet verschiedene Ebenen von Entscheidungsprozessen, die eine präzise Steuerung des Fahrzeugs ermöglichen.\\
+
+In Groot2 stehen unterschiedliche Arten von Knoten (Nodes) zur Verfügung, die sich ideal für die Modellierung von Verhaltensbäumen in autonomen Systemen eignen. Im Folgenden werden einige grundlegende Knotenarten vorgestellt, die in Groot2 verfügbar sind:
+
+\begin{itemize}
+    \item \textbf{Sequenzknoten}: Dieser Knoten führt seine Kinder nacheinander aus. Wenn ein Kindknoten fehlschlägt, wird die Ausführung abgebrochen.
+    \item \textbf{Dekoratorknoten}: Dekoratorknoten verändern das Verhalten ihres Kindknotens. Beispiele sind Inverter (invertiert das Ergebnis des Kindknotens) oder Repeater (wiederholt die Ausführung).
+    \item \textbf{Bedingungsknoten}: Dieser Knoten überprüft eine bestimmte Bedingung und gibt zurück, ob sie wahr oder falsch ist. Es wird oft in Verbindung mit Sequenz- oder Selektorknoten verwendet, um Entscheidungen zu treffen.
+    \item \textbf{Aktionsknoten}: Aktionsknoten repräsentieren konkrete Aktionen oder Operationen, die im System ausgeführt werden sollen. Zum Beispiel das Navigieren zu einem bestimmten Punkt oder das Bremsen des Fahrzeugs.
+    \item \textbf{Fallbacks}:
+    \item \textbf{Wurzelknoten (Root)}: Dieser Knoten bildet den Einstiegspunkt des Verhaltensbaums. Je nach Konfiguration kann es sich um einen Sequenzknoten, Selektorknoten oder einen anderen Knotentyp handeln.
+\end{itemize}
+
+Diese Knoten kommen im Behavior Tree zum Einsatz, um die Struktur und Logik des Baums zu gestalten. An dieser Stelle ist es wichtig zu betonen, dass der Behavior Tree noch nicht abschließend ist und einige Anforderungen noch nicht vollständig erfüllt wurden. Aktuell wurden folgende Anforderungen im vorliegenden Stand des Behavior Trees umgesetzt:\\
+
+
+\begin{itemize}
+    \item Ampel
+    \item Verkehrsschilder wie Stopschild, Vorfahrt, Zebrastreifen, Kreisverkehr
+    \item Überholvorgang
+    \item Fußgänger überquert den Zebrastreifen
+    \item Ein Fahrzeug befindet sich im Kreisverkehr
+    \item Autobahneinfahrt
+    \item Autobahnausfahrt
+    \item Einbahnstraße
+    \item Betreten verboten
+\end{itemize}
+
+\newpage
+\subsection{Implementierung}
+
+Die Umsetzung der bereits festgelegten Punkte im Code erfolgt durch die Erstellung eines Code-Rumpfes, wobei jeder Knoten im Baum als eigene Funktion implementiert wird. Zur Veranschaulichung wird hier ein Code-Snippet für das Szenario eines Überholvorgangs erstellt. Damit die BehaviorTree.CPP Bibliothek verwendet werden kann, ist es notwendig, sie durch den Include-Befehl in den Code zu integrieren:
+
+\begin{lstlisting}[language=C++, caption={Import der Bibliothek}]
+#include <iostream>
+#include <chrono>
+#include "behaviortree_cpp/action_node.h"
+#include "behaviortree_cpp/bt_factory.h"
+
+\end{lstlisting}
+
+Im nächsten Schritt werden die Bedingungsknoten in Funktionen umgewandelt. Dabei werden die Return-Statements in den Zeilen 7, 13 und 19 entsprechend bearbeitet, um den erfolgreichen Verlauf eines Überholvorgangs zu signalisieren. Hierbei wird SUCCESS zurückgegeben:
+
+\begin{lstlisting}[language=C++, caption={Bedingungsknoten}]
+using namespace std::chrono_literals;
+
+//CarInFront subtree
+BT::NodeStatus CarInFront()
+{
+    std::cout << "Car is in front" << std::endl;
+    return BT::NodeStatus::SUCCESS;
+}
+
+BT::NodeStatus solidLane()
+{
+    std::cout << "Overtake allowed" << std::endl;
+    return BT::NodeStatus::SUCCESS;
+}
+
+BT::NodeStatus Gegenverkehr()
+{
+    std::cout << "No incoming traffic" << std::endl;
+    return BT::NodeStatus::SUCCESS;
+}
+\end{lstlisting}
+
+\newpage
+Die Aktionsknoten werden nun in Form von Klassen implementiert. Im Folgenden sind die Klassen Overtake, Stop und Cruise als eigenständige Klassen umgesetzt, wodurch sie für die Wiederverwendung bereitstehen. Durch die Anpassungen des Szenarios, welches auf einen möglichen Überholvorgang ausgelegt ist, geben die Klassen Overtake und Cruise SUCCESS zurück:
+
+\begin{lstlisting}[language=C++, caption={Aktionsknoten}]
+class Overtake : public BT::SyncActionNode
+{
+    public:
+        explicit Overtake(const std::string &name) : BT::SyncActionNode(name, {})
+        {
+        }
+    BT::NodeStatus tick() override
+    {
+        std::this_thread::sleep_for(3s); //overtaking phase not longer than 2 minutes
+        std::cout << "Overtook car" << std::endl;
+        return BT::NodeStatus::SUCCESS;
+    }
+};
+
+class Stop : public BT::SyncActionNode
+{
+    public:
+        explicit Stop(const std::string &name) : BT::SyncActionNode(name, {})
+        {
+        }
+    BT::NodeStatus tick() override
+    {
+        std::cout << "Car stopped" << std::endl;
+        return BT::NodeStatus::FAILURE;
+    }
+};
+
+class Cruise : public BT::SyncActionNode
+{
+    public:
+        explicit Cruise(const std::string &name) : BT::SyncActionNode(name, {})
+        {
+        }
+    BT::NodeStatus tick() override
+    {
+        std::cout << "Cruise" << std::endl;
+        return BT::NodeStatus::SUCCESS;
+    }
+};
+\end{lstlisting}
+
+\newpage
+Um den Code auszuführen, ist es erforderlich, die einzelnen Bedingungsknoten, Aktionsknoten und Knotentypen zu registrieren. Im Anschluss wird in Zeile 15 die zuvor in Groot2 erstellte .xml-Datei integriert. Diese Datei enthält die strukturelle Darstellung des Baums:
+
+\begin{lstlisting}[language=C++, caption={Ausführen des Codes - main()}]
+int main()
+{
+    BT::BehaviorTreeFactory factory;
+
+    factory.registerSimpleCondition("CarInFront", std::bind(CarInFront));
+    factory.registerSimpleCondition("solidLane", std::bind(solidLane));
+    factory.registerNodeType<Overtake>("Overtake");
+
+    factory.registerSimpleCondition("Gegenverkehr", std::bind(Gegenverkehr));
+
+    factory.registerNodeType<Stop>("Stop");
+    factory.registerNodeType<Cruise>("Cruise");
+
+    //create tree
+    auto tree = factory.createTreeFromFile("./../BFMC_24.xml");
+
+    tree.tickOnce();
+
+    return 0;
+}
+
+\end{lstlisting}
+
+
+
+
+
+
+

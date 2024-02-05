@@ -1,0 +1,18 @@
+\section{Einleitung und Motivation}
+\autor{Aaron J. Müller}
+Damit ein autonomes Fahrzeug zuverlässig einer berechneten Solltrajektorie folgen kann, ist ein robuster und effizienter Regler notwendig.
+Häufig wird dieser in zwei Teilprobleme aufgeteilt: Ein Longitudinalregler regelt die Fahrgeschwindigkeit, während ein Lateralregler die Lenkung des Fahrzeugs steuert. 
+In diesem Kapitel soll die Entwicklung eines solchen Lateralreglers dokumentiert werden, welcher den bestehenden Lateralregler ersetzen soll.
+Zur Auswahl stehen dabei zwei grundlegend unterschiedliche Reglertypen; Stanley und \acs{MPC}. 
+Beide sollen verglichen werden, um auf dieser Basis zu entscheiden welche Art von Regler implementiert werden soll.
+
+Unabhängig von der Wahl des Reglers ist folgendes Vorgehen vorgesehen: 
+\begin{itemize}
+    \item Konzeption des Reglers, basierend auf Modellen des Fahrzeugs sowie der Fahrphysik
+    \item Implementierung des Reglers in einer MATLAB/Simulink Umgebung
+    \item Integration in den it:movES Softwarestack und Erprobung im Unity-Simulator
+    \item Inbetriebnahme auf dem realen Fahrzeug und Feintuning
+\end{itemize}
+
+Dadurch wird sowohl die theoretische Güte des Regelverhaltens als auch die tatsächliche Performance im Gesamtsystem ermittelt.
+Das ist notwendig, da die Solltrajektorie im Realbetrieb eine schlechtere Qualität als die simulierte hat, was das Regelverhalten maßgeblich beeinflusst.

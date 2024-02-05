@@ -27,22 +27,19 @@
 			bottom=30mm]{geometry}  % Einstellungen für die Seitenränder (links, rechts, oben, unten)
 
 % This is a preliminary title for your thesis.
-\newcommand{\thesisTitle}{Evaluierung von Systemen zur Speicherung und Bereitstellung von Binärdaten im Kontext von Web Services}
-
-% Your full name.
-\newcommand{\name}{Gamze Isik}
+\newcommand{\thesisTitle}{it:movES - BFMC 2024}
 
 % The time frame in which you want to write the thesis.
-\newcommand{\timeFrame}{20. März - \textbf{19. Juni 2023}}
+\newcommand{\timeFrame}{WS2023 - SS2024}
 
 % The primary supervisor. You probably do not need to change this.
-\newcommand{\supervisor}{Erstbetreuer: Prof. Martin Goik}
+\newcommand{\supervisor}{Prof. Dr.-Ing. Reiner Marchthaler}
 
 % The name(s) of your advisor(s). This is probably the PhD student or PostDoc that you are working with.
 \newcommand{\advisor}{Zweitbetreuer: Thomas Maier}
 
 % Select if this is a Bachelor or Master Thesis.
-\newcommand{\thesisType}{Bachelor}
+\newcommand{\thesisType}{Forschungsprojekt}
 
 
 \usepackage[all]{nowidow}
@@ -50,7 +47,6 @@
 \clubpenalty = 10000
 \widowpenalty = 10000
 \displaywidowpenalty = 10000
-
 
 %******************************************************************************	
 % Ebenen Einstellungen
@@ -115,15 +111,17 @@
 % Helfer während der Texterstellung
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{blindtext}      % Blindtext zum Testen von Textausgaben
-\usepackage[]{showkeys} % Anzeige der Referenz-/Labelnamen im Text, Dokument auf final deaktiviert Option
+%\usepackage[]{showkeys} % Anzeige der Referenz-/Labelnamen im Text, Dokument auf final deaktiviert Option
 \usepackage{fixme}  % ermöglicht die Verwendung von FixMes
 \usepackage[pagewise]{lineno} % Zeilennummern beim Korrekturlesen sinnvoll
 
-\usepackage[colorinlistoftodos,obeyDraft,backgroundcolor=red!40,bordercolor=red,linecolor=red,prependcaption]{todonotes}
+\usepackage{todonotes}
 % überschreibt die Voreinstellung "noinline" bei TODO Notes sodass diese immer Inline angezeigt werden
 \makeatletter
 \presetkeys{todonotes}{inline}{}
 \makeatother
+
+\newcommand{\autor}[2][]{\todo[linecolor=green,backgroundcolor=green!25,bordercolor=green, #1]{\textbf{Autor:} #2}}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -146,28 +144,31 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Literaturverzeichnis
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage[
-	style=authortitle-ibid, 	%Zitierstil
-	bibstyle=numeric, 		%Biblografiestil
-	backend=biber,
-	sortlocale=de_DE,
-	bibencoding=utf8,
-	hyperref,
-	defernumbers=true,
-	ibidtracker=context, 	% damit ebd. funktioniert
-	isbn=false, 			% ISBN im Literaturverzeichnis
-	url=true, 				% Url im Literaturverzeichnis
-	doi=false]{biblatex} 
+% \usepackage[
+% 	style=authortitle-ibid, 	%Zitierstil
+% 	bibstyle=numeric, 		%Biblografiestil
+% 	backend=biber,
+% 	sortlocale=de_DE,
+% 	bibencoding=utf8,
+% 	hyperref,
+% 	defernumbers=true,
+% 	ibidtracker=context, 	% damit ebd. funktioniert
+% 	isbn=false, 			% ISBN im Literaturverzeichnis
+% 	url=true, 				% Url im Literaturverzeichnis
+% 	doi=false]{biblatex} 
 
-% Lädt Anpassungen für den Zitierstil/Biblografiestil
-\include{./Bibtex/Biblatexanpassungen.tex}
+% % Lädt Anpassungen für den Zitierstil/Biblografiestil
+% \include{./Bibtex/Biblatexanpassungen.tex}
+\usepackage[style=ieee]{biblatex}
+\bibliography{Bibtex/Quellen}
 
 % Aufteilung des Quellenverzeichnis in verschiedene Abschnitte. 
-\defbibheading{literatur}{\subsection*{Literaturquellen}}
-\defbibheading{pdf}{\subsection*{Elektronische Dokumente}}
-\defbibheading{online}{\subsection*{Internetquellen}}
 
-\addbibresource{./Bibtex/Quellen.bib}
+% \defbibheading{literatur}{\subsection*{Literaturquellen}}
+% \defbibheading{pdf}{\subsection*{Elektronische Dokumente}}
+% \defbibheading{online}{\subsection*{Internetquellen}}
+
+% \addbibresource{./Bibtex/Quellen.bib}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Stichwortverzeichnis
@@ -184,10 +185,11 @@
 	bookmarks=true,
 	bookmarksopen=true,
 	bookmarksnumbered=true,
-	pdftitle={Evaluierung von Systemen zur Speicherung und Bereitstellung von Binaerdaten im Kontext von Web Services}, 
+	pdftitle={it:movES
+ BFMC 2024}, 
 	pdfauthor={\name},
-	pdfsubject={\thesisType Thesis: Evaluierung von Systemen zur Speicherung und Bereitstellung von Binaerdaten im Kontext von Web Services},
-	pdfkeywords={Speichersysteme},
+	pdfsubject={Forschungsprojekt: it:movES - BFMC 2024},
+	pdfkeywords={Autonomous Driving},
 	breaklinks=true,
 	colorlinks=true,
 	linkcolor=black,			% links in blau, black
@@ -281,7 +283,7 @@
 %Include
 %****************************************
 \include{./Deckblatt/Deckblatt}		% Deckblatt
-\include{./Erklaerung/Erklaerung} 	% Erklärung
+% \include{./Erklaerung/Erklaerung} 	% Erklärung
 \include{./Abstract/Abstract} 		% Abstract
 \include{./Inhaltsverzeichnis/Inhaltsverzeichnis}
 \thispagestyle{empty}
@@ -289,9 +291,9 @@
 \pagenumbering{arabic}
 \setcounter{page}{3}
 \glsaddall[types={\acronymtype}] % damit auch nicht benutzte Abkürzungen erscheinen
-\begin{singlespacing}	% Zeilenabstand 1.0
-\printglossary[type=\acronymtype,style=mylist,nonumberlist]
-\end{singlespacing}
+\begin{doublespacing}	% Zeilenabstand 2.0
+\printglossary[type=\acronymtype,nonumberlist, nogroupskip]
+\end{doublespacing}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -313,9 +315,10 @@
 \clearpage
 
 \include{./Einleitung/Einleitung} 
-\include{./TheoretischerTeil/TheoretischerTeil}
-\include{./PraktischerTeil/PraktischerTeil}
-\include{./Ergebnisse/Ergebnisse}
+\include{./ProjektÜberblick/ProjektÜberblick}
+\include{./Gesamtprojekt/Gesamtprojekt}
+\include{./Controller/Controller}
+\include{./BehaviorTree/BehaviorTree}
 \include{./Diskussion/Diskussion}
 \include{./Fazit/Fazit}
 
@@ -324,12 +327,16 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Literaturverzeichnis}
 \markboth{Literaturverzeichnis}{Literaturverzeichnis}
-\printbibliography[heading=online,keyword=online]
-\clearpage
-\printbibliography[heading=pdf,keyword=pdf]
-\clearpage
-\printbibliography[heading=literatur,keyword=literatur]
-\clearpage
+% \printbibliography[heading=online,keyword=online]
+% \clearpage
+% \printbibliography[heading=pdf,keyword=pdf]
+% \clearpage
+% \printbibliography[heading=literatur,keyword=literatur]
+% \clearpage
+
+
+\printbibliography[keyword={intern},heading=subbibliography,title={Interne Quellen}]
+\printbibliography[notkeyword={intern},heading=subbibliography,title={Öffentliche Quellen}]
 \phantomsection
 
 \include{./Anhang/Anhang}
